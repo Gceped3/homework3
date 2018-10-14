@@ -15,6 +15,47 @@
 //#include <fcnt1.h>
 #include <unistd.h>
 
+void doCommand(char **cmd){
+  char *file = '\0'; //will hold our filename
+  char *io = '\0';   // will tell us the input direction
+  char *cmd2 = '\0'; 
+
+  int i = 0;
+  while(cmd[i] != '\0'){
+    if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
+      io = cmd[i];    //gets the input/output direction
+      file = cmd[i+1];//gets the file name
+    }
+    if(strcmp(cmd[i],";")==0){
+      io = cmd[i];
+      cmd2 = cmd [i+1]; //get the second command
+      
+    }
+    i++; 
+  }
+  if((cmd2 == '\0' || file == '\0') && io == '\0'){
+    printf(" Cannot open file or Execute command");
+  }
+  
+  if(strcmp(io, ";") == 0){
+    printf("%s %s %s \n",cmd[0], io, cmd2);
+  }
+  if(strcmp(io,"<") == 0|| strcmp(io,">")==0){
+    printf("%s %s %s \n", cmd[0],io, file);
+  }
+  
+  int pid = fork(); 
+  if(pid == 0){
+   //do nothing yet...
+
+  }
+  else{
+    int status;
+    wait(&status);
+    printf("pid: %d status: %d \n", pid, WEXITSTATUS(status)); 
+  }
+}
+
 void sigint_handler(int sig){
   char msg[] = "\ncaught sigint\n";
   write(1,msg, sizeof(msg));
@@ -33,7 +74,7 @@ void sigstp_handler(int sig){
 int main(){
   //Input storage
   char line[500]; //Going based off of Lab 4 
-  char argsarray[20][100];
+  char *argsarray[20];
 
   //signals based on lab 5 code
   signal(SIGINT, sigint_handler);
@@ -44,18 +85,21 @@ int main(){
     printf("CS361 > "); //NEEDS to print out exactly like this
 
     fgets(line, 500, stdin); //read input
-    char *word = strtok(line, "\n");//reads line until newline character
+    char *word = strtok(line, " \n");//reads line until newline character, Also the space matters
     int i = 0;
     while(word){
-      strcpy(argsarray[i], word);
-      word = strtok(NULL, "\n");//sets word to NULL to be copied over again
-      i = i + 1;
+    //  printf("word: %s\n", word);
+      
+      argsarray[i]= word;
+      word = strtok(NULL, " \n");//sets word to NULL to be copied over again
+      i++;
     }
 
     if(strcmp(argsarray[0],"exit")== 0){
       break;
     }
-  
+    
+    doCommand(argsarray);
   }
 	
   return 0;
