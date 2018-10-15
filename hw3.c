@@ -15,38 +15,59 @@
 //#include <fcnt1.h>
 #include <unistd.h>
 
-void doCommand(char **cmd){
-  char *file = '\0'; //will hold our filename
-  char *io = '\0';   // will tell us the input direction
-  char *cmd2 = '\0'; 
+void forkIt(char *cmd){
+  int pid = fork();
+  if(pid == 0){
+     
+  }
+  else{
+    int status;
+    wait(&status);
+    printf("pid: %d status: %d \n", pid, WEXITSTATUS(status));
 
+  }
+}
+
+void doCommand(char **cmd){
+  char *file = '\0'; //will hold our filenames
+  char *file2 = '\0'; 
+  char *io = '\0';   // will tell us the input direction
+  char *io2 = '\0';
+  char *io3 = '\0';
+  char *cmd2 = '\0'; 
+  
+  //parse the input recieved 
   int i = 0;
-  while(cmd[i] != '\0'){
-    if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
-      io = cmd[i];    //gets the input/output direction
-      file = cmd[i+1];//gets the file name
+  while(1){
+    if(cmd[i]== '\0'){
+      break;
     }
-    if(strcmp(cmd[i],";")==0){
-      io = cmd[i];
-      cmd2 = cmd [i+1]; //get the second command
+    if(io2 != '\0'){
+      if(strcmp(cmd[i],">")==0 || strcmp(cmd[i],"<")==0){
+        io3 = cmd[i];    //gets the input/output direction
+        file2 = cmd[i+1];//gets the file name
+      }
+    }
+    else{
+      if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
+        io = cmd[i];    //gets the input/output direction
+        file = cmd[i+1];//gets the file name
+      }
+      if(strcmp(cmd[i],";")==0){
+        io2 = cmd[i];
+        cmd2 = cmd [i+1]; //get the second command
       
+      }
     }
     i++; 
-  }
-  if((cmd2 == '\0' || file == '\0') && io == '\0'){
-    printf(" Cannot open file or Execute command");
-  }
-  
-  if(strcmp(io, ";") == 0){
-    printf("%s %s %s \n",cmd[0], io, cmd2);
-  }
-  if(strcmp(io,"<") == 0|| strcmp(io,">")==0){
-    printf("%s %s %s \n", cmd[0],io, file);
   }
   
   int pid = fork(); 
   if(pid == 0){
    //do nothing yet...
+   
+   //execute
+   exit(execv(cmd[0],cmd));
 
   }
   else{
@@ -68,7 +89,7 @@ void sigstp_handler(int sig){
   write(1,msg, sizeof(msg));
   char prompt[] = "CS361 >";
   write(1, prompt, sizeof(prompt));
-  //Don't think it needs to do anything else? Infact it doesn't need to stop either.
+  //Don't think it needs to do anything else? 
 }
 
 int main(){
@@ -94,12 +115,14 @@ int main(){
       word = strtok(NULL, " \n");//sets word to NULL to be copied over again
       i++;
     }
+    argsarray[i+1] = '\0';
 
     if(strcmp(argsarray[0],"exit")== 0){
       break;
     }
-    
+   
     doCommand(argsarray);
+    
   }
 	
   return 0;
