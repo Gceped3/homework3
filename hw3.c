@@ -36,6 +36,10 @@ void doCommand(char **cmd){
   char *io3 = '\0';
   char *cmd2 = '\0'; 
   char *second[20];
+
+  int pHold=0;
+  int pHold2=0;
+  int sHold = 0;
   
   //parse the input recieved 
   int i = 0;
@@ -143,11 +147,18 @@ void doCommand(char **cmd){
     else{
     int status1;
     wait(&status1);
-    printf("pid: %d status: %d \n", pid2, WEXITSTATUS(status1));
+    pHold2 = pid2;
+    //printf("pid: %d status: %d \n", pid2, WEXITSTATUS(status1));
+    sHold = status1;
 
    }
   }
+    pHold = pid;
     printf("pid: %d status: %d \n", pid, WEXITSTATUS(status)); 
+    if(pHold2 != 0){
+       printf("pid: %d status: %d \n", pHold2, WEXITSTATUS(sHold)); 
+
+    }
   }
 }
 
@@ -191,7 +202,7 @@ int main(){
     }
     argsarray[i+1] = '\0';
 
-    if(strcmp(argsarray[0],"exit")== 0){
+    if(strcmp(argsarray[0],"exit")== 0 || strcmp(argsarray[0],"Exit")==0){
       break;
     }
    
