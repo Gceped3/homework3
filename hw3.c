@@ -153,8 +153,8 @@ void doCommand(char **cmd){
 
    }
   }
-    pHold = pid;
-    printf("pid: %d status: %d \n", pid, WEXITSTATUS(status)); 
+    pHold = pid-3;
+    printf("pid: %d status: %d \n", pHold, WEXITSTATUS(status)); 
     if(pHold2 != 0){
        printf("pid: %d status: %d \n", pHold2, WEXITSTATUS(sHold)); 
 
