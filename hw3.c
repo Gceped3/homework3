@@ -42,6 +42,19 @@ void doCommand(char **cmd){
     if(cmd[i]== '\0'){
       break;
     }
+      if(strcmp(cmd[i],";")==0){
+        io2 = cmd[i];
+        cmd2 = cmd[i+1];
+        if(cmd[i+2] != '\0'){
+           io3 = cmd[i+2];
+           file2 = cmd[i+3];
+           cmd[i+2]= '\0';
+           cmd[i+3] = '\0';
+        }
+        cmd[i] = '\0';
+        cmd[i+1] = '\0';
+        break;
+      }
       if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
         io = cmd[i];    //gets the input/output direction
         file = cmd[i+1];//gets the file name
