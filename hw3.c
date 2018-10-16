@@ -35,6 +35,7 @@ void doCommand(char **cmd){
   char *io2 = '\0';  //if this is a ';' then there is a second command
   char *io3 = '\0';
   char *cmd2 = '\0'; 
+  char *second[20];
   
   //parse the input recieved 
   int i = 0;
@@ -45,11 +46,22 @@ void doCommand(char **cmd){
       if(strcmp(cmd[i],";")==0){
         io2 = cmd[i];
         cmd2 = cmd[i+1];
+        second[0]=cmd[i+1];
+        second[1] = '\0';
         if(cmd[i+2] != '\0'){
-           io3 = cmd[i+2];
-           file2 = cmd[i+3];
-           cmd[i+2]= '\0';
-           cmd[i+3] = '\0';
+           if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
+            io3 = cmd[i+2];
+            file2 = cmd[i+3];
+            cmd[i+2]= '\0';
+            cmd[i+3] = '\0';
+           }
+           else{
+            second[0] = cmd[i+1];
+            second[1] = cmd[i+2];
+            cmd[i+2] = '\0';
+            second[2] = '\0';
+            //printf("%s\n",second[0]);
+           }
         }
         cmd[i] = '\0';
         cmd[i+1] = '\0';
@@ -63,6 +75,7 @@ void doCommand(char **cmd){
           if(strcmp(cmd[i+2],";")== 0){
             io2 = cmd[i+2];
             cmd2 = cmd[i+3];
+            second[0] = cmd[i+3];
            
             //can't be sure the line will always involve another file.  
             if(cmd[i+4] != '\0'){
@@ -125,7 +138,7 @@ void doCommand(char **cmd){
       }
 
      } 
-     exit(execvp(cmd2,cmd));
+     exit(execvp(second[0],second));
     } 
     else{
     int status1;
