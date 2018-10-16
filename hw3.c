@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include <fcnt1.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 void forkIt(char *cmd){
@@ -32,7 +32,7 @@ void doCommand(char **cmd){
   char *file = '\0'; //will hold our filenames
   char *file2 = '\0'; 
   char *io = '\0';   // will tell us the input direction
-  char *io2 = '\0';
+  char *io2 = '\0';  //if this is a ';' then there is a second command
   char *io3 = '\0';
   char *cmd2 = '\0'; 
   
@@ -42,32 +42,45 @@ void doCommand(char **cmd){
     if(cmd[i]== '\0'){
       break;
     }
-    if(io2 != '\0'){
-      if(strcmp(cmd[i],">")==0 || strcmp(cmd[i],"<")==0){
-        io3 = cmd[i];    //gets the input/output direction
-        file2 = cmd[i+1];//gets the file name
-      }
-    }
-    else{
       if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
         io = cmd[i];    //gets the input/output direction
         file = cmd[i+1];//gets the file name
+        printf("%s %s \n",file, io); 
+        if(cmd[i+2] != '\0'){
+          if(strcmp(cmd[i+2],";")== 0){
+            io2 = cmd[i+2];
+            cmd2 = cmd[i+3];
+            io3 = cmd[i + 4];
+            file2 = cmd[i + 5];
+
+            cmd[i+2]= '\0';
+            cmd[i+3]= '\0';
+            cmd[i + 4] = '\0';
+            cmd[i + 5] = '\0';
+          }
+        }
+        //clear these lines
+        cmd[i] = '\0'; 
+        cmd[i+1] = '\0';
+        break;
       }
-      if(strcmp(cmd[i],";")==0){
-        io2 = cmd[i];
-        cmd2 = cmd [i+1]; //get the second command
-      
-      }
-    }
+    
     i++; 
   }
   
   int pid = fork(); 
   if(pid == 0){
-   //do nothing yet...
+   if(io != '\0'){
+    if(strcmp(io,">")==0){//redirects output to file name
+     int fd = open(file, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR|S_IXUSR|S_IROTH);//reads|writes, User can RWX, others can R 
+      dup2(fd,1);
+      close(fd);
+    }
    
+   }
    //execute
-   exit(execv(cmd[0],cmd));
+   printf("%s",file);
+   exit(execvp(cmd[0],cmd));
 
   }
   else{
