@@ -45,18 +45,22 @@ void doCommand(char **cmd){
       if((strcmp(cmd[i],">") == 0)||( strcmp(cmd[i],"<")== 0)){
         io = cmd[i];    //gets the input/output direction
         file = cmd[i+1];//gets the file name
-        printf("%s %s \n",file, io); 
+       // printf("%s %s \n",file, io); 
         if(cmd[i+2] != '\0'){
           if(strcmp(cmd[i+2],";")== 0){
             io2 = cmd[i+2];
             cmd2 = cmd[i+3];
-            io3 = cmd[i + 4];
-            file2 = cmd[i + 5];
+           
+            //can't be sure the line will always involve another file.  
+            if(cmd[i+4] != '\0'){
+              io3 = cmd[i + 4];
+              file2 = cmd[i + 5];
+              cmd[i + 4] = '\0';
+              cmd[i + 5] = '\0';
 
+            }
             cmd[i+2]= '\0';
-            cmd[i+3]= '\0';
-            cmd[i + 4] = '\0';
-            cmd[i + 5] = '\0';
+             cmd[i+3]= '\0';
           }
         }
         //clear these lines
@@ -76,16 +80,47 @@ void doCommand(char **cmd){
       dup2(fd,1);
       close(fd);
     }
+    if(strcmp(io,"<")==0){
+     int fd1 = open(file, O_RDONLY);
+     dup2(fd1,0);
+     close(fd1);
+    }
    
    }
    //execute
-   printf("%s",file);
+   // printf("%s",file);
    exit(execvp(cmd[0],cmd));
-
   }
   else{
     int status;
     wait(&status);
+    //before reporting both processes must be completed
+     //second command
+   if(io2 != '\0'){
+    int pid2 = fork();
+    if(pid2 == 0){
+     if(io3 != '\0'){
+      if(strcmp(io3,">")==0){//redirects output to file name
+       int fd2 = open(file2, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR|S_IXUSR|S_IROTH);//same as above
+       dup2(fd2,1);
+       close(fd2);
+      }
+      if(strcmp(io3,"<")==0){
+       int fd3 = open(file, O_RDONLY);
+       dup2(fd3,0);
+       close(fd3);
+      }
+
+     } 
+     exit(execvp(cmd2,cmd));
+    } 
+    else{
+    int status1;
+    wait(&status1);
+    printf("pid: %d status: %d \n", pid2, WEXITSTATUS(status1));
+
+   }
+  }
     printf("pid: %d status: %d \n", pid, WEXITSTATUS(status)); 
   }
 }
