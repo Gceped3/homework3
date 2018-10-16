@@ -119,7 +119,8 @@ void doCommand(char **cmd){
    }
    //execute
    // printf("%s",file);
-   exit(execvp(cmd[0],cmd));
+   //pHold = getpid();
+   exit(execv(cmd[0],cmd));
   }
   else{
     int status;
@@ -142,21 +143,22 @@ void doCommand(char **cmd){
       }
 
      } 
-     exit(execvp(second[0],second));
+     //pHold2 = getpid();
+     exit(execv(second[0],second));
     } 
     else{
     int status1;
     wait(&status1);
     pHold2 = pid2;
-    //printf("pid: %d status: %d \n", pid2, WEXITSTATUS(status1));
+    //printf("pid:%d status: %d \n", pid2, WEXITSTATUS(status1));
     sHold = status1;
 
    }
   }
-    pHold = pid-3;
-    printf("pid: %d status: %d \n", pHold, WEXITSTATUS(status)); 
+    pHold = pid;
+    printf("pid:%d status %d \n", pHold, WEXITSTATUS(status)); 
     if(pHold2 != 0){
-       printf("pid: %d status: %d \n", pHold2, WEXITSTATUS(sHold)); 
+       printf("pid:%d status:%d \n", pHold2, WEXITSTATUS(sHold)); 
 
     }
   }
