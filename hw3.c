@@ -126,7 +126,7 @@ void doCommand(char **cmd){
     int status;
     wait(&status);
     //before reporting both processes must be completed
-     //second command
+    //second command
    if(io2 != '\0'){
     int pid2 = fork();
     if(pid2 == 0){
@@ -156,7 +156,7 @@ void doCommand(char **cmd){
    }
   }
     pHold = pid;
-    printf("pid:%d status %d \n", pHold, WEXITSTATUS(status)); 
+    printf("pid:%d status:%d \n", pHold, WEXITSTATUS(status)); 
     if(pHold2 != 0){
        printf("pid:%d status:%d \n", pHold2, WEXITSTATUS(sHold)); 
 
